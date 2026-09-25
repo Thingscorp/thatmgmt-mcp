@@ -2,7 +2,7 @@ name: Publish to MCP Registry
 
 # Publishes server.json to the official MCP registry when a version tag is pushed.
 # Uses GitHub OIDC, so no stored secrets and no browser login are needed.
-# The io.github.russfranky namespace is verified automatically for this repo.
+# The io.github.thingscorp namespace is verified automatically for this repo.
 #
 # Release flow:
 #   1. Bump version in package.json and server.json (they must match the tag).
