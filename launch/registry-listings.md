@@ -20,7 +20,7 @@ capability the API does not have yet.
   money uses a two-step approval: the agent shows the human the locked price
   first, and nothing moves without an explicit approval. The server never
   executes blindly.
-- Repo: https://github.com/russfranky/thatmgmt-mcp
+- Repo: https://github.com/thingscorp/thatmgmt-mcp
 - Install: git clone, npm install, set TMGMT_API_KEY, add to MCP client config
   (full steps in the repo README, under 5 minutes).
 - Env vars: TMGMT_API_KEY (required, secret), TMGMT_BASE_URL (optional,
@@ -29,13 +29,13 @@ capability the API does not have yet.
 
 ## Official MCP Registry
 
-- Manifest: server.json in the repo root. Name io.github.russfranky/thatmgmt-mcp,
+- Manifest: server.json in the repo root. Name io.github.thingscorp/thatmgmt-mcp,
   validated against the registry schema (name pattern, 100-char description
   limit, snake_case registry_type, required fields all pass).
 - Submission path: automatic. The `.github/workflows/publish-mcp.yml` workflow
   runs on version tag pushes (v*), validates the manifest, logs in via GitHub
   OIDC (no browser, no stored secret), and publishes. Namespace
-  io.github.russfranky is verified automatically for this repo.
+  io.github.thingscorp is verified automatically for this repo.
 - Blockers before first publish:
   1. The npm package @thatmgmt/mcp must exist on the public npm
      registry, because the manifest references it. One-time owner step, free:
@@ -50,7 +50,7 @@ capability the API does not have yet.
 ## Smithery
 
 - Needs a browser: sign in at smithery.ai with GitHub, choose Add Server,
-  connect the russfranky/thatmgmt-mcp repo. Smithery deploys from the repo.
+  connect the thingscorp/thatmgmt-mcp repo. Smithery deploys from the repo.
 - Use the shared listing copy above. No submission made from here.
 
 ## mcp.so

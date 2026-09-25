@@ -19,14 +19,14 @@ In a temp dir (not the repo):
 
 ## 3. Tag the release
 
-- Resolve the current `russfranky/thatmgmt-mcp` main HEAD live via the GitHub API (never use a hardcoded SHA).
+- Resolve the current `thingscorp/thatmgmt-mcp` main HEAD live via the GitHub API (never use a hardcoded SHA).
 - Push a lightweight tag `v0.2.0` pointing straight at that commit SHA via the Git Data API.
 - Verify the remote ref `refs/tags/v0.2.0` matches the SHA.
 
 ## 4. Verify the registry workflow
 
 - The tag push triggers the `publish-mcp.yml` workflow. Watch the run: tests must pass, server.json must validate, and mcp-publisher must publish without error.
-- Confirm the server appears in the official MCP registry under `io.github.russfranky/thatmgmt-mcp`.
+- Confirm the server appears in the official MCP registry under `io.github.thingscorp/thatmgmt-mcp`.
 
 ## 5. Clean up credentials and schedules
 

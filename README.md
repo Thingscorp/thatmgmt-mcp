@@ -14,7 +14,7 @@ Machine docs: https://thatmgmt.com/llms-full.txt
 The public reads need no key and no account. Clone and run:
 
 ```sh
-git clone https://github.com/russfranky/thatmgmt-mcp.git thatmgmt-mcp
+git clone https://github.com/thingscorp/thatmgmt-mcp.git thatmgmt-mcp
 cd thatmgmt-mcp
 npm install
 node src/index.js
@@ -34,7 +34,7 @@ $12.99 wholesale + $0.13 cut = $13.12 total.
 Prereqs: Node 18+.
 
 ```sh
-git clone https://github.com/russfranky/thatmgmt-mcp.git thatmgmt-mcp
+git clone https://github.com/thingscorp/thatmgmt-mcp.git thatmgmt-mcp
 cd thatmgmt-mcp
 npm install
 export TMGMT_API_KEY="your-thatmgmt-api-key"
@@ -138,7 +138,7 @@ npm test   # 47 tests, mocked HTTP, no live calls
 ## Registry
 
 `server.json` is the manifest for the official MCP registry
-(`io.github.russfranky/thatmgmt-mcp`). It is published automatically by the
+(`io.github.thingscorp/thatmgmt-mcp`). It is published automatically by the
 `publish-mcp` GitHub Actions workflow when a version tag (e.g. `v0.2.0`) is
 pushed; the workflow validates the manifest against the registry schema and
 authenticates the namespace via GitHub OIDC, so no manual login is needed.

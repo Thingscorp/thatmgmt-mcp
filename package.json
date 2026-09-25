@@ -4,7 +4,7 @@
     "thatmgmt-mcp": "src/index.js"
   },
   "bugs": {
-    "url": "https://github.com/russfranky/thatmgmt-mcp/issues"
+    "url": "https://github.com/thingscorp/thatmgmt-mcp/issues"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.30.0"
@@ -20,7 +20,7 @@
     "LICENSE",
     "server.json"
   ],
-  "homepage": "https://github.com/russfranky/thatmgmt-mcp#readme",
+  "homepage": "https://github.com/thingscorp/thatmgmt-mcp#readme",
   "keywords": [
     "mcp",
     "model-context-protocol",
@@ -34,7 +34,7 @@
   "name": "@thatmgmt/mcp",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/russfranky/thatmgmt-mcp.git"
+    "url": "git+https://github.com/thingscorp/thatmgmt-mcp.git"
   },
   "scripts": {
     "start": "node src/index.js",

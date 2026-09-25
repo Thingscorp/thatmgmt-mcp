@@ -31,6 +31,6 @@ tools are planned for the 0.3.0 release.
 Links:
 
 - Platform: https://thatmgmt.com
-- MCP server: https://github.com/russfranky/thatmgmt-mcp
+- MCP server: https://github.com/thingscorp/thatmgmt-mcp
 - Machine docs: https://thatmgmt.com/llms.txt
 - API spec: https://thatmgmt.com/openapi.json
