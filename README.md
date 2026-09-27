@@ -11,7 +11,7 @@ Machine docs: https://thatmgmt.com/llms-full.txt
 
 ## Try it with zero signup (no API key)
 
-The public reads need no key and no account. Clone and run:
+The public reads need no key and no account. Run the published package with zero install: `npx -y @thatmgmt/mcp`. Or clone and run:
 
 ```sh
 git clone https://github.com/thingscorp/thatmgmt-mcp.git thatmgmt-mcp
@@ -20,8 +20,8 @@ npm install
 node src/index.js
 ```
 
-(Once `@thatmgmt/mcp` is published on npm, `npx -y @thatmgmt/mcp` will run
-it with zero install.)
+
+
 
 Then in your MCP client, call `tmgmt_capabilities` to see the public
 surface, `domains_check_availability` to check a name, and
@@ -98,7 +98,7 @@ use: quote id passed back plus an explicit `approved: true` flag, or the
 call is refused. The gate is implemented and tested now so the safety
 design is ready the day execute routes exist.
 
-Current release: 0.2.0 (read-only public tools plus validated plans).
+Current release: 0.2.1 (read-only public tools plus validated plans).
 Execute tools are planned for the 0.3.0 release.
 
 ## Tools
@@ -138,12 +138,12 @@ npm test   # 47 tests, mocked HTTP, no live calls
 ## Registry
 
 `server.json` is the manifest for the official MCP registry
-(`io.github.thingscorp/thatmgmt-mcp`). It is published automatically by the
-`publish-mcp` GitHub Actions workflow when a version tag (e.g. `v0.2.0`) is
-pushed; the workflow validates the manifest against the registry schema and
-authenticates the namespace via GitHub OIDC, so no manual login is needed.
+(`io.github.Thingscorp/thatmgmt-mcp`). Releases are automated: pushing a
+version tag (e.g. `v0.2.1`) triggers the **Publish to npm** workflow
+(`npm publish` via the `NPM_TOKEN` secret) and the **Publish to MCP**
+Registry** workflow (validates `server.json`, publishes via GitHub OIDC).
 
-Prerequisite the workflow cannot do itself: the `@thatmgmt/mcp`
-npm package must exist on the public npm registry before the first publish,
-since the manifest references it. Publish it once with `npm publish`
-(requires npm access for the `@thatmgmt` scope), then push the version tag.
+Release flow: bump `version` in `package.json` (keep the `mcpName`
+field — `io.github.Thingscorp/thatmgmt-mcp`), push to `main`, then
+create the tag/release. The tag must match `package.json`; the registry
+validates the *published* npm metadata, so ship a new version for new fields.
