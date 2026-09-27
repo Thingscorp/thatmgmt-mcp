@@ -56,7 +56,7 @@ jobs:
         run: |
           npm install -g ajv-cli
           curl -fsSL -o /tmp/mcp-server-schema.json https://raw.githubusercontent.com/modelcontextprotocol/registry/main/docs/reference/server-json/draft/server.schema.json
-          ajv validate -s /tmp/mcp-server-schema.json -d server.json
+          ajv validate -s /tmp/mcp-server-schema.json -d server.json --strict=false
 
       - name: Login and publish
         run: |
