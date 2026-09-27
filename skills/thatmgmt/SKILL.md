@@ -102,5 +102,5 @@ Tenant, key needed:
 
 ## Related
 
-- MCP server: `@thatmgmt/mcp` (npm, publishing; source: this repo, `https://github.com/thingscorp/thatmgmt-mcp`) exposes these flows as agent tools. Run it today via `git clone` + `node src/index.js`; `npx @thatmgmt/mcp` once the npm package is live.
+- MCP server: `@thatmgmt/mcp` (npm, live; source: this repo, `https://github.com/thingscorp/thatmgmt-mcp`) exposes these flows as agent tools. Run it via `npx -y @thatmgmt/mcp`, or from source with `git clone` + `node src/index.js`.
 - Full route reference: `https://thatmgmt.com/api.html` (OpenAPI).
