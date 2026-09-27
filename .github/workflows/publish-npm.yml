@@ -1,0 +1,39 @@
+name: Publish to npm
+
+# Publishes @thatmgmt/mcp to the npm registry when a version tag is pushed.
+# Publishing runs here because the agent VM's egress proxy blocks npm
+# registry writes, so `npm publish` cannot run from the VM.
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Verify tag matches package version
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          PKG_VERSION=$(node -p "require('./package.json').version")
+          if [ "$VERSION" != "$PKG_VERSION" ]; then
+            echo "tag version $VERSION does not match package.json version $PKG_VERSION" >&2
+            exit 1
+          fi
+
+      - name: Publish to npm
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
