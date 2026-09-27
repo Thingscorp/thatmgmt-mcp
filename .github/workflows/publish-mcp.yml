@@ -55,7 +55,8 @@ jobs:
       - name: Validate server.json
         run: |
           npm install -g ajv-cli
-          ajv validate -s https://raw.githubusercontent.com/modelcontextprotocol/registry/main/schema/server/v1.json -d server.json --spec=draft2020
+          curl -fsSL -o /tmp/mcp-server-schema.json https://raw.githubusercontent.com/modelcontextprotocol/registry/main/schema/server/v1.json
+          ajv validate -s /tmp/mcp-server-schema.json -d server.json --spec=draft2020
 
       - name: Login and publish
         run: |
