@@ -34,6 +34,13 @@ jobs:
           fi
 
       - name: Publish to npm
-        run: npm publish --access public
+        run: |
+          PKG_NAME=$(node -p "require('./package.json').name")
+          VERSION="${GITHUB_REF_NAME#v}"
+          if [ "$(npm view "$PKG_NAME" version 2>/dev/null)" = "$VERSION" ]; then
+            echo "$PKG_NAME@$VERSION already on the registry, skipping publish"
+          else
+            npm publish --access public
+          fi
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
