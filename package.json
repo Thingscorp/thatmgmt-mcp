@@ -9,7 +9,7 @@
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.30.0"
   },
-  "description": "MCP server wrapping the ThatMgmt domain reseller API: check availability, suggest names, get locked quotes, and prepare registrations. Read-only plus validated plans; nothing executes blindly.",
+  "description": "MCP server for ThatMgmt — buy domains with crypto, no signup, no subscription. Check availability, suggest names, get locked quotes, and prepare registrations.",
   "engines": {
     "node": ">=18"
   },
@@ -25,7 +25,9 @@
     "mcp",
     "model-context-protocol",
     "domains",
+    "domain-registration",
     "dns",
+    "crypto",
     "thatmgmt",
     "ai-agents"
   ],
@@ -41,5 +43,5 @@
     "test": "node --test test/*.test.js"
   },
   "type": "module",
-  "version": "0.2.1"
+  "version": "0.2.2"
 }
