@@ -25,9 +25,7 @@ node src/index.js
 
 Then in your MCP client, call `tmgmt_capabilities` to see the public
 surface, `domains_check_availability` to check a name, and
-`domains_get_quote` for the locked price: wholesale plus the itemized 1%
-platform cut, printed plainly. Example quote for a 1-year `.com`:
-$12.99 wholesale + $0.13 cut = $13.12 total.
+`domains_get_quote` for the locked price: wholesale plus the itemized 0.15% platform cut, printed plainly. Example quote for a 1-year `.com`: $12.99 wholesale + $0.02 cut = $13.01 total.
 
 ## Setup with an API key (tenant tools)
 
