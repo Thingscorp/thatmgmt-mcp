@@ -1,0 +1,27 @@
+# thatmgmt-mcp
+
+MCP (Model Context Protocol) server wrapping the ThatMgmt domain API.
+An AI agent in Cursor, Claude Code, or Replit can check availability, get
+name suggestions, lock a price quote, and prepare a registration — no
+dashboard. Nothing executes blindly: the API exposes no execute endpoints,
+so this server plans and prices, never purchases.
+
+- Repo: https://github.com/Thingscorp/thatmgmt-mcp
+- npm: `npx -y @thatmgmt/mcp` (MCP client config in README)
+- Docs: https://github.com/Thingscorp/thatmgmt-mcp#readme
+- Agent skill: `skills/thatmgmt/SKILL.md` in the repo
+- Base API: https://api.thatmgmt.com — spec https://thatmgmt.com/openapi.json
+
+## Tools (13)
+
+Public, no key: `tmgmt_health`, `tmgmt_capabilities`,
+`domains_check_availability`, `domains_get_quote`.
+Tenant (`TMGMT_API_KEY`): `domains_suggest`,
+`domains_prepare_registration`, `domains_list`, `domains_dns`,
+`portfolio_health`, `portfolio_renewal_risk`, `portfolio_exceptions`,
+`orders_dry_run`, `offerings`.
+
+## Flow
+
+1. `domains_get_quote` → locked price (wholesale + itemized 1% cut + total). Show the human.
+2. `domains_prepare_registration` (key required) → safety-checked plan. Never executes.
