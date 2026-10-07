@@ -1,105 +1,105 @@
 # thatmgmt-mcp
 
-An MCP (Model Context Protocol) server that wraps the ThatMgmt domain API.
-An AI agent in Cursor, Claude Code, or Replit can check availability, get name
-suggestions, lock a price quote, and prepare a registration, all without
-touching a dashboard.
+[![license](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+[![npm](https://img.shields.io/npm/v/@thatmgmt/mcp)](https://www.npmjs.com/package/@thatmgmt/mcp)
 
-Base API: https://api.thatmgmt.com
-Spec: https://thatmgmt.com/openapi.json (47 routes)
-Machine docs: https://thatmgmt.com/llms-full.txt
+An MCP (Model Context Protocol) server that wraps the ThatMgmt domain API. **Check availability, get locked price quotes, and prepare registrations from any MCP client — with zero signup for the public tools.** Tenant tools (portfolio, suggestions, dry-run planning) unlock with an API key. Nothing executes blindly: the API exposes no execute endpoints, so this server plans and prices, never purchases.
 
-## Try it with zero signup (no API key)
+Base API: `https://api.thatmgmt.com`
+Spec: [openapi.json](https://thatmgmt.com/openapi.json)
+Machine docs: [llms-full.txt](https://thatmgmt.com/llms-full.txt)
 
-The public reads need no key and no account. Run the published package with zero install: `npx -y @thatmgmt/mcp`. Or clone and run:
+## Verified claims
 
-```sh
+Every claim below is backed by a test in `test/` — fully mocked, no network, no key, no charges. Run them yourself: `npm test` (47/47 pass).
+
+| Claim | Backing data |
+|---|---|
+| 13 MCP tools, exactly 4 of them public | `test/tools.test.js` "exposes the expected tool set" asserts all 13 names; "exactly the zero-signup tools are marked public" pins `tmgmt_health`, `tmgmt_capabilities`, `domains_check_availability`, `domains_get_quote` |
+| Tenant tools fail closed without an API key | `test/server.test.js` "refuses tenant tools without an API key": `isError` true, message names `TMGMT_API_KEY` |
+| Public tools send no Authorization header | `test/server.test.js` "public reads work with no API key and send no Authorization header" asserts the header is absent on all 4 public routes |
+| The API key never leaks into error messages | `test/thatmgmt.test.js` "never leaks the API key in error messages": key replaced with `[REDACTED]` |
+| Exactly one retry on retryable GET / 429 / 5xx; none on 400 or non-retryable 503 | `test/thatmgmt.test.js`: 2 fetch calls after a 429; 1 call for a 400 and for a 503 marked non-retryable |
+| The approval gate refuses without a quote id, without `approved: true`, and on a mismatched id | `test/tools.test.js` approval-gate cases |
+| Invalid domains are rejected before any network call | `test/tools.test.js` "callTool rejects an invalid domain before any network call": 0 fetch calls |
+| A quote for an unavailable domain says so plainly instead of returning bare `{available:false}` | `test/tools.test.js` quote-shaping cases |
+| Transfer dry-runs pass `authCodePresent`, never the raw auth code | `test/tools.test.js` "passes authCodePresent (never the raw code)" |
+
+## Quickstart
+
+```bash
+git clone https://github.com/thingscorp/thatmgmt-mcp.git && cd thatmgmt-mcp
+npm install
+node demo-agent-run.mjs   # real server over stdio, stub API, zero signup
+```
+
+The demo drives the real server through `tmgmt_health` → availability → locked quote → prepare-registration, with no network and no key. Live mode (public tools only, read-only): `node demo-agent-run.mjs --live`.
+
+## Install
+
+From npm (no clone needed):
+
+```bash
+npx -y @thatmgmt/mcp
+```
+
+From source (Node 18+):
+
+```bash
 git clone https://github.com/thingscorp/thatmgmt-mcp.git thatmgmt-mcp
 cd thatmgmt-mcp
 npm install
-node src/index.js
+npm test
 ```
 
-
-
-
-Then in your MCP client, call `tmgmt_capabilities` to see the public
-surface, `domains_check_availability` to check a name, and
-`domains_get_quote` for the locked price: wholesale plus the itemized 0.15% platform cut, printed plainly. Example quote for a 1-year `.com`: $12.99 wholesale + $0.02 cut = $13.01 total.
-
-## Setup with an API key (tenant tools)
-
-Prereqs: Node 18+.
-
-```sh
-git clone https://github.com/thingscorp/thatmgmt-mcp.git thatmgmt-mcp
-cd thatmgmt-mcp
-npm install
-export TMGMT_API_KEY="your-thatmgmt-api-key"
-```
-
-The key is only needed for tenant tools: name suggestions, portfolio
-views, the dry-run planner, and prepare-registration. Everything else
-works without it.
-
-Add to your MCP client config (Claude Code / Cursor):
+Add to your MCP client (Claude Code `.mcp.json`, Cursor, Replit):
 
 ```json
 {
   "mcpServers": {
     "thatmgmt": {
-      "command": "node",
-      "args": ["/path/to/thatmgmt-mcp/src/index.js"],
+      "command": "npx",
+      "args": ["-y", "@thatmgmt/mcp"],
       "env": { "TMGMT_API_KEY": "your-thatmgmt-api-key" }
     }
   }
 }
 ```
 
-Verify:
+The key is only needed for tenant tools; the public reads work without it.
 
-```sh
-npm test
-```
+Releases are automated: pushing a version tag (e.g. `v0.2.2`) runs the **Publish to npm** workflow (`npm publish` via the `NPM_TOKEN` secret) and the **Publish to MCP Registry** workflow (validates `server.json`, publishes `io.github.thingscorp/thatmgmt-mcp` via GitHub OIDC). The tag must match `version` in `package.json` and `server.json`.
 
-Optional: `TMGMT_BASE_URL` overrides the API base (default `https://api.thatmgmt.com`).
-`TMGMT_TIMEOUT_MS` overrides the per-request timeout in milliseconds (default
-`30000`). Transient failures (network errors, timeouts, 429s, retryable 5xx)
-are retried once on side-effect-free calls; the server never retries anything
-that could move money.
+## Usage
 
-## The two-step purchase flow
+The two-step purchase flow is written into every tool description so agents show the human the price first:
 
-Spend-effect actions never execute blindly. The intended flow, written into
-every tool description so agents show the human the price first:
+1. **Quote.** Call `domains_get_quote`. It returns the locked price: `wholesaleCents`, the itemized 1% cut (`platformCutCents`, `platformCutBasisPoints`), and `totalCents`. No key needed. Show this to the human.
+2. **Plan.** Call `domains_prepare_registration` (needs `TMGMT_API_KEY`). It returns the safety-checked plan. It never executes anything.
 
-1. **Quote.** Call `domains_get_quote`. It returns the locked price:
-   `wholesaleCents`, the itemized 1% cut (`platformCutCents`,
-   `platformCutBasisPoints`), and `totalCents`. No key needed. Show this to
-   the human.
-2. **Plan.** Call `domains_prepare_registration` (needs `TMGMT_API_KEY`).
-   It returns the safety-checked plan. It never executes anything.
+A quote carries wholesale, the flat 1% platform cut, and the total — no subscription, no tiers. The shape, from the mocked test fixture: `wholesaleCents: 1299`, `platformCutCents: 13`, `platformCutBasisPoints: 100`, `totalCents: 1312`.
 
-Pricing: no subscription. A flat 1% cut applies to spend-effect actions only.
-Checkout options (crypto via Privy, or card/bank fallback) are arranged
-outside this server.
+### What this server cannot do
 
-## Important: what this server cannot do
+The ThatMgmt API exposes **no execute endpoints**. Purchase, renewal, transfer, and DNS changes are never executed by the API; the API returns validated plans and preflights instead. This server therefore cannot register, renew, or transfer a domain, and it will never claim it did. `src/approval.js` holds the approval gate that future execute tools will use (quote id passed back plus an explicit `approved: true` flag, or the call is refused) — implemented and tested now so the safety design is ready the day execute routes exist.
 
-The ThatMgmt API exposes **no execute endpoints**. Purchase, renewal,
-transfer, and DNS changes are never executed by the API; the API returns
-validated plans and preflights instead. This server therefore cannot
-register, renew, or transfer a domain, and it will never claim it did.
+Current release: 0.2.2 (read-only public tools plus validated plans). Execute tools are planned for the 0.3.0 release.
 
-`src/approval.js` holds the approval gate that future execute tools will
-use: quote id passed back plus an explicit `approved: true` flag, or the
-call is refused. The gate is implemented and tested now so the safety
-design is ready the day execute routes exist.
+## Configuration
 
-Current release: 0.2.1 (read-only public tools plus validated plans).
-Execute tools are planned for the 0.3.0 release.
+Env vars only — no flags, no config file:
 
-## Tools
+| Variable | Required | Default | What it does |
+|---|---|---|---|
+| `TMGMT_API_KEY` | Only for tenant tools | — | Tenant API key, sent as a Bearer token. Never logged; redacted from errors. |
+| `TMGMT_BASE_URL` | No | `https://api.thatmgmt.com` | API base URL override. |
+| `TMGMT_TIMEOUT_MS` | No | `30000` | Per-request timeout in milliseconds. |
+
+Transient failures (network errors, timeouts, 429s, retryable 5xx) are retried once on side-effect-free calls; the server never retries anything that could move money.
+
+## API reference
+
+The 13 tools the server exposes over MCP stdio, exactly as defined in `src/tools.js`. Each maps to a real route in the [live OpenAPI spec](https://thatmgmt.com/openapi.json); no invented endpoints.
 
 | Tool | What it does | API route | Key needed |
 |---|---|---|---|
@@ -117,31 +117,16 @@ Execute tools are planned for the 0.3.0 release.
 | `orders_dry_run` | Full order plan with itemized pricing, never moves money | `POST /v1/orders/dry-run` | Yes |
 | `offerings` | Offering coverage matrix | `GET /v1/offerings` | Yes |
 
-Public tools never send an Authorization header and never ask for a key.
-Tenant tools return 401 without a key; the server tells you to set
-`TMGMT_API_KEY`. The key is sent as a Bearer token and is never logged.
+Public tools never send an Authorization header and never ask for a key. Tenant tools return a 401-style refusal without a key; the server tells you to set `TMGMT_API_KEY`.
 
-## Agent skill
+## For agents
 
-`skills/thatmgmt/SKILL.md` is the agent skill for this server: when to use
-it, the tool list, and the two-step purchase flow. Point your agent at it
-for the fastest start.
+`skills/thatmgmt/SKILL.md` is the agent skill for this server: when to use it, the tool list, and the two-step purchase flow. Point your agent at it for the fastest start.
 
-## Development
+## Contributing
 
-```sh
-npm test   # 47 tests, mocked HTTP, no live calls
-```
+See [CONTRIBUTING.md](CONTRIBUTING.md).
 
-## Registry
+## License
 
-`server.json` is the manifest for the official MCP registry
-(`io.github.Thingscorp/thatmgmt-mcp`). Releases are automated: pushing a
-version tag (e.g. `v0.2.1`) triggers the **Publish to npm** workflow
-(`npm publish` via the `NPM_TOKEN` secret) and the **Publish to MCP**
-Registry** workflow (validates `server.json`, publishes via GitHub OIDC).
-
-Release flow: bump `version` in `package.json` (keep the `mcpName`
-field — `io.github.Thingscorp/thatmgmt-mcp`), push to `main`, then
-create the tag/release. The tag must match `package.json`; the registry
-validates the *published* npm metadata, so ship a new version for new fields.
+MIT. See [LICENSE](LICENSE).
